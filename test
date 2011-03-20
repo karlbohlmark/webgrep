@@ -1,27 +1,6 @@
 #!/usr/bin/env node
 var jsdom = require('jsdom')
 
-var removeTags = function(fromString, tagName){
-  var buffer = ''
-    var start = '<' + tagName, end = '</' + tagName
-    var from = 0, to = 0
-    var eof = false
-    while(true)
-    {
-      to = fromString.indexOf(start, from)
-      if(to<0) {
-        (eof = true) && (to = fromString.length)
-      }
-      buffer += fromString.substr(from, to-from)
-
-      if(eof) return buffer
-
-      from = fromString.indexOf(end, to) + 9
-      //console.log (from)
-    }
-  return buffer
-}
-
 var selector =  process.argv[2]
 
 var stdin = process.openStdin()
@@ -31,17 +10,7 @@ process.stdin.on('data', function(data){
 })
 
 process.stdin.on('end', function(){
-  var window = jsdom.jsdom().createWindow();
-  startBody = buffer.indexOf('<', buffer.indexOf('<body') + 5)
-  var endBody = buffer.indexOf('</body', startBody)
-  var body = removeTags (buffer.substr(startBody, endBody-startBody), 'script')
-  //console.log(body)
-  
-
-  jsdom.jQueryify(window, function() {
-    window.$('body').append(body);
+  jsdom.env(body, ['http://code.jquery.com/jquery-1.5.min.js'], function(e, window){
     console.log(window.$(selector).text())
-  })   
+  }
 })
-
-
